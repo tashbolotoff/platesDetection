@@ -12,4 +12,5 @@ public interface PlateRecognitionService {
     PlateRecognition create(PlateRecognition plateRecognition);
     public void saveData() throws ParserConfigurationException, IOException, SAXException, ParseException;
     List<PlateRecognition> getAll();
+
 }

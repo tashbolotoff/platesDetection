@@ -17,7 +17,7 @@ public class MainController {
     @Autowired
     private PlateRecognitionService plateRecognitionService;
 
-    @GetMapping("/list")
+    @GetMapping("/")
     public String getUserList(Model model) throws ParserConfigurationException, IOException, SAXException, ParseException {
         plateRecognitionService.saveData();
         model.addAttribute("plates", plateRecognitionService.getAll());

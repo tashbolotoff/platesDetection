@@ -66,8 +66,6 @@ public class PlateRecognitionServiceImpl implements PlateRecognitionService {
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(stocks);
         doc.getDocumentElement().normalize();
-
-        System.out.println(doc.getDocumentElement().getNodeName());
         NodeList nodes = doc.getElementsByTagName("mediaSegmentDescriptor");
 
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -95,7 +93,13 @@ public class PlateRecognitionServiceImpl implements PlateRecognitionService {
                     .camIp("192.168.1.166")
                     .count(1)
                     .build();
-            plateRecognitionRepo.save(plateRecognition);
+            if(plateRecognitionRepo.getAllByRecognitionDateAndPlate(new SimpleDateFormat("yyyyMMddHHmmss").parse(date), plate) == null){
+                if(plateRecognitionRepo.getPlateRecognitionByPlateOrderByIdDesc(plate) != null){
+                    int count = plateRecognitionRepo.getPlateRecognitionByPlateOrderByIdDesc(plate).getCount()+1;
+                    plateRecognition.setCount(count);
+                }
+                plateRecognitionRepo.save(plateRecognition);
+            }
 
         }
     }
