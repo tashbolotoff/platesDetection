@@ -28,7 +28,7 @@ public class PlateRecognition {
     @Column(name = "cam_ip")
     String camIp;
 
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(name = "recognition_date")
     Date recognitionDate;
 

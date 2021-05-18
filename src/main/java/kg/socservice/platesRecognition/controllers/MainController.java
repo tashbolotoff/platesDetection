@@ -10,6 +10,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.text.ParseException;
 
 @Controller
 public class MainController {
@@ -17,9 +18,9 @@ public class MainController {
     private PlateRecognitionService plateRecognitionService;
 
     @GetMapping("/list")
-    public String getUserList(Model model) throws ParserConfigurationException, IOException, SAXException {
+    public String getUserList(Model model) throws ParserConfigurationException, IOException, SAXException, ParseException {
         plateRecognitionService.saveData();
         model.addAttribute("plates", plateRecognitionService.getAll());
-        return "plate_list";
+        return "plates/plates_list";
     }
 }

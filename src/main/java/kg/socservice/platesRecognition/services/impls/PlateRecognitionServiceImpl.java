@@ -24,6 +24,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -37,49 +41,9 @@ public class PlateRecognitionServiceImpl implements PlateRecognitionService {
         return plateRecognitionRepo.save(plateRecognition);
     }
 
-//    @Override
-//    public void saveData() {
-//        Unirest.setTimeouts(0, 0);
-//        try {
-//
-//            HttpResponse<String> response = Unirest.post("http://192.168.1.166/ISAPI/ContentMgmt/search")
-//                    .header("Authorization", "Basic YWRtaW46R2FyYWoyMDIx")
-//                    .header("Content-Type", "application/xml")
-//                    .body("<?xml version: '1.0' encoding='utf-8'?>\r\n        <CMSearchDescription>\r\n            <searchID>ANY_STRING_HERE</searchID><trackIDList><trackID>103</trackID></trackIDList>\r\n            <timeSpanList><timeSpan><startTime>2020-06-22T02:25:13Z</startTime><endTime>2021-06-22T02:25:13Z</endTime></timeSpan></timeSpanList>\r\n            <contentTypeList><contentType>metadata</contentType></contentTypeList>\r\n            <maxResults>100</maxResults><searchResultPostion>0</searchResultPostion>\r\n            <metadataList>\r\n                <metadataDescriptor>//recordType.meta.std-cgi.com/vehicleDetection</metadataDescriptor>\r\n                <SearchProperity><plateSearchMask/><nation>0</nation></SearchProperity>\r\n            </metadataList>\r\n        </CMSearchDescription>")
-//                    .asString();;
-//
-//            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
-//                    new InputSource(new StringReader(response.toString())));
-//
-//            NodeList nodeList = document.getDocumentElement().getChildNodes();
-//
-//            for (int i = 0; i < nodeList.getLength(); i++) {
-//                Node node = nodeList.item(i);
-//                if (node.getNodeType() == Node.ELEMENT_NODE) {
-//                    Element element = (Element) node;
-//                    if (element.getNodeName().contains("mediaSegmentDescriptor")) {
-//                        System.out.println(element.getElementsByTagName("NO").item(0).getTextContent());
-//                    }
-//                }
-//            }
-//
-////            //And from this also.....
-////            for (int i = 0; i < nodeList.getLength(); i++) {
-////                Element element1 = (Element) nodeList.item(i);
-////                System.out.println(element1.getElementsByTagName("matchList").item(0).getTextContent());
-////            }
-//        } catch (UnirestException | ParserConfigurationException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (SAXException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     @Override
-    public void saveData() throws ParserConfigurationException, IOException, SAXException {
-
+    public void saveData() throws ParserConfigurationException, IOException, SAXException, ParseException {
+        List<String> plates = new ArrayList<>();
         Unirest.setTimeouts(0, 0);
         try {
 
@@ -110,10 +74,29 @@ public class PlateRecognitionServiceImpl implements PlateRecognitionService {
             Node node = nodes.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
-                System.out.println("contentType: " + getValue("contentType", element));
-                System.out.println("codecType: " + getValue("codecType", element));
-                System.out.println("playbackURI: " + getValue("playbackURI", element));
+//                System.out.println("playbackURI: " + getValue("playbackURI", element));
+                plates.add(getValue("playbackURI", element));
+
             }
+        }
+        for (int i = 0; i < plates.size(); i++) {
+            String date = null;
+            String plate = null;
+            int indexOfSabaka = plates.get(i).indexOf("@") + 1;
+            date = plates.get(i).substring(indexOfSabaka, indexOfSabaka + 14);
+            int indexOf_ = indexOfSabaka + 15;
+            String substr = plates.get(i).substring(indexOf_, plates.get(i).length()-1);
+            int indexOf_i = substr.indexOf("&");
+            plate = plates.get(i).substring(indexOf_, indexOf_+indexOf_i);
+
+            PlateRecognition plateRecognition = PlateRecognition.builder()
+                    .plate(plate)
+                    .recognitionDate(new SimpleDateFormat("yyyyMMddHHmmss").parse(date))
+                    .camIp("192.168.1.166")
+                    .count(1)
+                    .build();
+            plateRecognitionRepo.save(plateRecognition);
+
         }
     }
 
