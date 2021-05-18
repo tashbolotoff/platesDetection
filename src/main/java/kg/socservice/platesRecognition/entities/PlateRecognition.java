@@ -25,12 +25,12 @@ public class PlateRecognition {
     @Column(name = "plate")
     String plate;
 
-    @Column(name = "plate")
+    @Column(name = "cam_ip")
     String camIp;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "recognition_date")
-    Date vacationDate;
+    Date recognitionDate;
 
     @Column(name = "count")
     Integer count;

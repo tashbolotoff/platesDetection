@@ -14,6 +14,7 @@ public class MainController {
 
     @GetMapping("/list")
     public String getUserList(Model model) {
+        plateRecognitionService.saveData();
         model.addAttribute("plates", plateRecognitionService.getAll());
         return "plate_list";
     }
